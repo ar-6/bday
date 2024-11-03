@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Countdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #FFC2C3;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            color: #411519;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 50px;
+            color: #411519;
+        }
+
+        #countdown-text {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #411519;
+        }
+
+        #countdown {
+            display: flex;
+            gap: 5px;
+        }
+
+        #countdown div {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.5em;
+            color: #411519;
+            margin-left: auto; /* Centering */
+            margin-right: auto; /* Centering */
+        }
+
+        #balloons, #fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #celebration-message {
+            display: none;
+            font-size: 4em;
+            text-align: center;
+            animation: colorChange 3s infinite;
+        }
+
+        #cake-image {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+            width: 200px; /* Adjust the width as needed */
+            margin-left: auto; /* Centering */
+            margin-right: auto; /* Centering */
+        }
+
+        @keyframes colorChange {
+            0%, 100% { color: red; }
+            25% { color: yellow; }
+            50% { color: green; }
+            75% { color: blue; }
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: explode 10s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { opacity: 1; transform: scale(1) translate(0, 0); }
+            100% { opacity: 0; transform: scale(3) translate(50px, 100vh); }
+        }
+
+        .balloon {
+            position: absolute;
+            width: 25px;
+            height: 35px;
+            border-radius: 50% 50% 100% 100%;
+            opacity: 0.9;
+            animation: floatUp 9s ease-in forwards; /* Update animation */
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh); opacity: 1; } /* Start from bottom */
+            100% { transform: translateY(-100vh); opacity: 0; } /* Move to top */
+        }
+
+        /* Media Queries for additional responsiveness */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            #countdown-text {
+                font-size: 1.2em;
+            }
+
+            #countdown div {
+                font-size: 1em;
+                padding: 8px;
+            }
+
+            #celebration-message {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Birthday of a Lovely Person</h1>
+        <div id="countdown-text">Countdown for a Special Moment</div>
+        <div id="countdown">
+            <div><span id="days">00</span> Days</div>
+            <div><span id="hours">00</span> Hours</div>
+            <div><span id="minutes">00</span> Minutes</div>
+            <div><span id="seconds">00</span> Seconds</div>
+        </div>
+        <h1 id="celebration-message">Happy Birthday Parvaneh!</h1>
+        <img id="cake-image" src="birthday-cake-cake.svg" alt="Birthday Cake">
+    </div>
+    <div id="balloons"></div>
+    <div id="fireworks"></div>
+    <script>
+        const birthday = new Date('2024-11-04T00:00:00');
+        const countdownText = document.getElementById("countdown-text");
+        const celebrationMessage = document.getElementById("celebration-message");
+        const cakeImage = document.getElementById("cake-image");
+        const fireworksContainer = document.getElementById("fireworks");
+        const balloonsContainer = document.getElementById("balloons");
+
+        function updateCountdown() {
+            const now = new Date();
+            const timeDifference = birthday - now;
+
+            if (timeDifference <= 0) {
+                clearInterval(countdownInterval);
+                startCelebration();
+                return;
+            }
+
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            document.getElementById("days").textContent = days.toString().padStart(2, '0');
+            document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+        }
+
+        function startFireworks() {
+            for (let i = 0; i < 20; i++) {
+                const firework = document.createElement("div");
+                firework.classList.add("firework");
+                firework.style.left = `${Math.random() * 100}vw`;
+                firework.style.top = `${Math.random() * 50}vh`;
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                fireworksContainer.appendChild(firework);
+
+                setTimeout(() => {
+                    firework.remove();
+                }, 1500);
+            }
+            setTimeout(startFireworks, 500);
+        }
+
+        function startBalloons() {
+            const balloonCount = 20; // Number of balloons to generate each time
+            const balloonInterval = 1000; // Time in milliseconds between balloon generations
+
+            // Function to create balloons
+            const createBalloons = () => {
+                for (let i = 0; i < balloonCount; i++) {
+                    const balloon = document.createElement("div");
+                    balloon.className = "balloon";
+                    balloon.style.left = `${Math.random() * 100}vw`;
+                    balloon.style.animationDuration = `${3 + Math.random() * 5}s`;
+                    balloon.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                    balloonsContainer.appendChild(balloon);
+
+                    // Remove balloon after its animation duration + some time
+                    setTimeout(() => {
+                        balloon.remove();
+                    }, 8000);
+                }
+            };
+
+            createBalloons(); // Create initial balloons
+            setInterval(createBalloons, balloonInterval); // Repeat balloon generation every specified interval
+        }
+
+        function startCelebration() {
+            countdownText.style.display = "none";
+            document.getElementById("countdown").style.display = "none";
+            celebrationMessage.style.display = "block";
+            cakeImage.style.display = "block"; // Show the cake image
+
+            // Start balloons after celebration starts
+            startBalloons();
+        }
+
+        // Start the countdown
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        startFireworks(); // Start fireworks when the page loads
+    </script>
+</body>
+</html>
